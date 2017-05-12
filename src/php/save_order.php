@@ -45,7 +45,7 @@ if (mysqli_connect_errno()) {
 
         $error = "";
         
-        $sql2 = "insert into `orders` (item, price, quantity) VALUES('$item', '$price', '$quantity')";
+        $sql2 = "insert into `orders` (item, price, quantity, customerName) VALUES('$item', '$price', '$quantity', '$name')";
         if (!mysqli_query($db_conn, $sql2)) {
             $error .= mysqli_error($db_conn);
         }    

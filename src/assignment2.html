@@ -105,8 +105,22 @@
          jsonItem += allRows.join(",") + '}'
 
 
+
+        //Customer
+
+        var jsonItem2 = '{';
+        allRows = [];
+        rowItem ="";
+        allRows.push('"' + "name" + '": [' + '"' + document.getElementById('name').value + '"' + ']');
+        allRows.push('"' + "address" + '": [' + '"' + document.getElementById('address').value + '"' + ']');
+        allRows.push('"' + "area" + '": [' + '"' + document.getElementById('area').value + '"' + ']');
+        jsonItem2 += allRows.join(",") + '}'
+
+        console.log(jsonItem2);
+
+
         send = $.ajax({
-          data: {order:jsonItem},
+          data: {order:jsonItem, customer:jsonItem2},
           url: "php/save_order.php",
           type: "post",
           success: function(msg) {
@@ -130,32 +144,6 @@
             console.log("Submitted order");
         });
 
-
-
-
-
-        //Customer
-
-        var jsonItem2 = '{';
-        allRows = [];
-        rowItem ="";
-        allRows.push('"' + "name" + '": [' + '"' + document.getElementById('name').value + '"' + ']');
-        allRows.push('"' + "address" + '": [' + '"' + document.getElementById('address').value + '"' + ']');
-        allRows.push('"' + "area" + '": [' + '"' + document.getElementById('area').value + '"' + ']');
-        jsonItem2 += allRows.join(",") + '}'
-
-        console.log(jsonItem2);
-
-
-        send = $.ajax({
-          data: {customer:jsonItem2},
-          url: "php/save_order.php",
-          type: "post",
-          success: function(msg) {
-                // alert(msg);
-                console.log(msg);
-            }
-        });
 
       
       }

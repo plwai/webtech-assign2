@@ -56,9 +56,6 @@
             "address": address,
             "area": area
           }
-
-          var customerJSON = JSON.stringify(customerInfo);
-          var ordersJSON = JSON.stringify(orders);
         });
 
         $('#cancelOrder').click(function() {
@@ -68,6 +65,9 @@
         });
 
         $('#sendOrder').click(function() {
+          var customerJSON = JSON.stringify(customerInfo);
+          var ordersJSON = JSON.stringify(orders);
+
           $.ajax({
             method: "post",
             url: "save_order.php",
@@ -84,6 +84,7 @@
       });
 
       var orders = {};
+      var customerInfo = {};
 
       function chooseItem(item, price) {
         $('#item').text(item);

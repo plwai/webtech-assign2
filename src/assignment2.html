@@ -1,20 +1,47 @@
 <html>
   <head>
     <title>Assignment 2</title>
+    <style>
+      .glyphicon.spinning {
+        animation: spin 1s infinite linear;
+        -webkit-animation: spin2 1s infinite linear;
+      }
+
+      @keyframes spin {
+        from { transform: scale(1) rotate(0deg);}
+        to { transform: scale(1) rotate(360deg);}
+      }
+
+      @-webkit-keyframes spin2 {
+        from { -webkit-transform: rotate(0deg);}
+        to { -webkit-transform: rotate(360deg);}
+      }
+
+      .glyphicon-left {
+        margin-right: 7px;
+      }
+    </style>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script>
       $(document).ready(function() {
         $('#saveorder').click(function() {
+          var name = $('#name');
+          var address = $('#address');
+          var area = $('#area');
+
           if(Object.keys(orders).length == 0) {
             alert("Click the number to order food.");
 
             return false;
           }
 
-          var name = $('#name');
-          var address = $('#address');
-          var area = $('#area');
+          if(!name.val() || !address.val() || !area.val()) {
+            alert("Please fill in your information.");
+
+            return false;
+          }
 
           $('#custInfo').html("<b>" + name.val() + "</b>" + "<br>" + address.val() + "<br>" + area.val());
 
@@ -65,8 +92,11 @@
         });
 
         $('#sendOrder').click(function() {
+          var sendOrderButton = $(this);
           var customerJSON = JSON.stringify(customerInfo);
           var ordersJSON = JSON.stringify(orders);
+
+          sendOrderButton.button("loading");
 
           $.ajax({
             type: "post",
@@ -96,10 +126,12 @@
             $('#tblSum').hide();
             $('#tblmain').show();
             $('#tblcust').show();
+            sendOrderButton.button('reset');
           })
           .fail(function(data) {
             console.log("fail");
             alert("Something wrong. Please try again later.");
+            sendOrderButton.button('reset');
           });
         });
       });
@@ -313,7 +345,8 @@
             <tbody>
               <tr>
                 <td colspan="4" align="center">
-                  <button class="btn btn-primary" type="button" id="sendOrder">Continue</button>
+                  <button class="btn btn-primary" type="button" id="sendOrder"
+                    data-loading-text="<span class='glyphicon-left glyphicon glyphicon-refresh spinning'></span>... Loading ...">Continue</button>
                   <button class="btn btn-primary" type="button" id="cancelOrder">Cancel</button>
                 </td>
               </tr>

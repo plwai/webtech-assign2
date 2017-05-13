@@ -68,8 +68,6 @@
           var customerJSON = JSON.stringify(customerInfo);
           var ordersJSON = JSON.stringify(orders);
 
-          console.log(ordersJSON);
-
           $.ajax({
             type: "post",
             url: "save_order.php",
@@ -77,10 +75,31 @@
           })
           .done(function(data) {
             console.log("success");
-            console.log(data);
+            alert("Your order is confirmed!");
+
+            $.each(orders, function(key, value) {
+              var row_item = value.tblrow;
+
+              row_item.remove();
+              delete orders[key];
+            });
+
+            $("#totalpay").text("");
+            $('#item').text("");
+            $('#price').text("");
+            $('#qty').val(0);
+
+            $('#name').val('');
+            $('#address').val('');
+            $('#area').val('');
+
+            $('#tblSum').hide();
+            $('#tblmain').show();
+            $('#tblcust').show();
           })
           .fail(function(data) {
             console.log("fail");
+            alert("Something wrong. Please try again later.");
           });
         });
       });
@@ -229,12 +248,12 @@
             <tbody>
               <tr>
                 <th align="right">Name:</th>
-                <td><input class="form-control" type="text" id="name" size="30" value="Lionel Messi"></td>
+                <td><input class="form-control" type="text" id="name" size="30" value=""></td>
               </tr>
               <tr>
                 <th align="right" valign="top">Address:</th>
                 <td>
-                  <input class="form-control" type="text" id="address" size="50" value="Block L07, Jalan Merbau, KTHO">
+                  <input class="form-control" type="text" id="address" size="50" value="">
                   <br>
                   <span style="font-size: 10pt;">(Apartment/building/unit no., street address)</span>
                 </td>
@@ -252,7 +271,7 @@
                     <option value="Sri Pulai">Sri Pulai</option>
                     <option value="Sri Pulai Perdana">Sri Pulai Perdana</option>
                     <option value="Sri Pulai Perdana 2">Sri Pulai Perdana 2</option>
-                    <option value="UTM" selected>UTM</option>
+                    <option value="UTM">UTM</option>
                   </select>
                 </td>
               </tr>

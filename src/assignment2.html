@@ -94,11 +94,19 @@
 
         var jsonItem = '{';
          var allRows = [];
-         var tableMain = $('#tblmain tr:not(:nth-child(1)):not(:nth-child(2)):not(:nth-last-child(2)):not(:nth-last-child(1))').each(function(i) {        
+         var tableMain = $('#tblmain tr:not(:nth-child(1)):not(:nth-child(2)):not(:nth-last-child(2)):not(:nth-last-child(1))').each(function(i) {       
             tableRow = $(this).children();
             var rowItem = [];
+            var rowItemCount = 0; 
             tableRow.each(function() {
-               rowItem.push('"' + $(this).text() + '"');
+              if(rowItemCount == 0){
+                var foodName = $(this).text().substring(0, $(this).text().indexOf('-') - 1);
+                rowItem.push('"' + foodName + '"');
+                rowItemCount++;
+              }
+              else
+                rowItem.push('"' + $(this).text() + '"');
+               
             });
             allRows.push('"' + "item" + i + '": [' + rowItem.join(',') + ']');
          })

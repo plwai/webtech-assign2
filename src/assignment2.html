@@ -52,9 +52,9 @@
           $('#tblSum').show();
 
           customerInfo = {
-            "name": name,
-            "address": address,
-            "area": area
+            "name": name.val(),
+            "address": address.val(),
+            "area": area.val()
           }
         });
 
@@ -68,8 +68,10 @@
           var customerJSON = JSON.stringify(customerInfo);
           var ordersJSON = JSON.stringify(orders);
 
+          console.log(ordersJSON);
+
           $.ajax({
-            method: "post",
+            type: "post",
             url: "save_order.php",
             data: {customer: customerJSON, order: ordersJSON}
           })

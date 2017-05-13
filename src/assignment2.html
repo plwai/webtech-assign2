@@ -100,7 +100,7 @@
 
           $.ajax({
             type: "post",
-            url: "save_order.php",
+            url: "php/save_order.php",
             data: {customer: customerJSON, order: ordersJSON}
           })
           .done(function(data) {

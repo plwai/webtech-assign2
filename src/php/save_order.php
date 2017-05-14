@@ -12,7 +12,6 @@ $dataCustomer = json_decode($jsonstr_customer, true);
 $dataOrder = json_decode($jsonstr_order, true);
 
 
-$count = 0;
 // Connect and select database.
 $db_conn = mysqli_connect("localhost","root","","marrybrowndb");
 
@@ -25,30 +24,62 @@ if (mysqli_connect_errno()) {
 
     $error = "";
 
-    $name = ($dataCustomer["name"][0]);
-    $address = ($dataCustomer["address"][0]);
-    $area = ($dataCustomer["area"][0]);    
+    $name = ($dataCustomer["name"]);
+    $address = ($dataCustomer["address"]);
+    $area = ($dataCustomer["area"]);    
 
     $sql = "insert into `customers`(name, address, area) VALUES('$name', '$address', '$area')";
         if (!mysqli_query($db_conn, $sql)) {
             $error = mysqli_error($db_conn);
         }
 
-    foreach($dataOrder as $jsonItem) {
-    
-        
 
-        $item = ($dataOrder["item".($count)][0]);
-        $price = ($dataOrder["item".($count)][1]);
-        $quantity = ($dataOrder["item".($count)][2]);
-        $count++;
+    $customerID = 0;
+    // try
+    // {
+    //     $query = mysql_query(
+    //         "select `customers`.`id_customer`
+    //         FROM `customers`
+    //         ORDER BY `customers`.`id_customer` DESC LIMIT 1");
+    //     if (!$query){
+    //        throw new Exception('Database error: ' . mysql_error());
+    //     }
+    //     $row = mysqli_fetch_assoc($query);
+    //     $customerID = $row["id_customer"];
+    // }
+    // catch(Exception $e)
+    // {
+    //     echo $e->getMessage();
+    // }
 
+    $query = (
+            "select `customers`.`id_customer`
+            FROM `customers`
+            ORDER BY `customers`.`id_customer` DESC LIMIT 1");
+
+    $result = mysqli_query($db_conn, $query);
+    $row = mysqli_fetch_assoc($result);
+    // echo "Result: " . $row['value'];
+    $customerID = $row['id_customer'];
+
+
+    foreach($dataOrder as $key => $value) {
+        $item = $key;
+        $count = 0;
+        foreach ($value as $key2 => $value2) {
+                if($count == 0)
+                    $price = $value2;
+                else if($count == 1)
+                    $quantity = $value2;
+
+                $count++;
+            }
         $error = "";
-        
-        $sql2 = "insert into `orders` (item, price, quantity, customerName) VALUES('$item', '$price', '$quantity', '$name')";
-        if (!mysqli_query($db_conn, $sql2)) {
-            $error .= mysqli_error($db_conn);
-        }    
+            
+            $sql2 = "insert into `orders` (item, price, qty, id_customer) VALUES('$item', '$price', '$quantity', '$customerID')";
+            if (!mysqli_query($db_conn, $sql2)) {
+                $error .= mysqli_error($db_conn);
+            }   
             
     }
 

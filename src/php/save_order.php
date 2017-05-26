@@ -35,23 +35,6 @@ if (mysqli_connect_errno()) {
 
 
     $customerID = 0;
-    // try
-    // {
-    //     $query = mysql_query(
-    //         "select `customers`.`id_customer`
-    //         FROM `customers`
-    //         ORDER BY `customers`.`id_customer` DESC LIMIT 1");
-    //     if (!$query){
-    //        throw new Exception('Database error: ' . mysql_error());
-    //     }
-    //     $row = mysqli_fetch_assoc($query);
-    //     $customerID = $row["id_customer"];
-    // }
-    // catch(Exception $e)
-    // {
-    //     echo $e->getMessage();
-    // }
-
     $query = (
             "select `customers`.`id_customer`
             FROM `customers`

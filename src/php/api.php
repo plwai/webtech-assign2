@@ -19,98 +19,90 @@ if (mysqli_connect_errno()) {
     switch ($method) {
       case 'POST':
 
-      if($_POST["action"] == "save_order")
-      {
-        $jsonstr_customer = $_REQUEST["customer"];
-        $jsonstr_order = $_REQUEST["order"];
+        if($_POST["action"] == "save_order")
+        {
+          $jsonstr_customer = $_REQUEST["customer"];
+          $jsonstr_order = $_REQUEST["order"];
 
-        $dataCustomer = json_decode($jsonstr_customer, true);
-        $dataOrder = json_decode($jsonstr_order, true);
-
-
-        // Check connection
-        if (mysqli_connect_errno()) {
-            $error = mysqli_connect_error();
-            echo "{error: \"$error\", customer: $jsonstr_customer, order: $jsonstr_order}";
-            
-        } else {
-
-            $error = "";
-
-            $name = ($dataCustomer["name"]);
-            $address = ($dataCustomer["address"]);
-            $area = ($dataCustomer["area"]);    
-
-            $sql = "insert into `customers`(name, address, area) VALUES('$name', '$address', '$area')";
-                if (!mysqli_query($db_conn, $sql)) {
-                    $error = mysqli_error($db_conn);
-                }
+          $dataCustomer = json_decode($jsonstr_customer, true);
+          $dataOrder = json_decode($jsonstr_order, true);
 
 
-            $customerID = 0;
-            $query = (
-                    "select `customers`.`id_customer`
-                    FROM `customers`
-                    ORDER BY `customers`.`id_customer` DESC LIMIT 1");
+          // Check connection
+          if (mysqli_connect_errno()) {
+              $error = mysqli_connect_error();
+              echo "{error: \"$error\", customer: $jsonstr_customer, order: $jsonstr_order}";
+              
+          } else {
 
-            $result = mysqli_query($db_conn, $query);
-            $row = mysqli_fetch_assoc($result);
-            $customerID = $row['id_customer'];
+              $error = "";
+
+              $name = ($dataCustomer["name"]);
+              $address = ($dataCustomer["address"]);
+              $area = ($dataCustomer["area"]);    
+
+              $sql = "insert into `customers`(name, address, area) VALUES('$name', '$address', '$area')";
+                  if (!mysqli_query($db_conn, $sql)) {
+                      $error = mysqli_error($db_conn);
+                  }
 
 
-            foreach($dataOrder as $key => $value) {
-                $item = $key;
-                $count = 0;
-                foreach ($value as $key2 => $value2) {
-                        if($count == 0)
-                            $price = $value2;
-                        else if($count == 1)
-                            $quantity = $value2;
+              $customerID = 0;
+              $query = (
+                      "select `customers`.`id_customer`
+                      FROM `customers`
+                      ORDER BY `customers`.`id_customer` DESC LIMIT 1");
 
-                        $count++;
-                    }
-                $error = "";
-                    
-                    $sql2 = "insert into `orders` (item, price, qty, id_customer) VALUES('$item', '$price', '$quantity', '$customerID')";
-                    if (!mysqli_query($db_conn, $sql2)) {
-                        $error .= mysqli_error($db_conn);
-                    }   
-                    
-            }
+              $result = mysqli_query($db_conn, $query);
+              $row = mysqli_fetch_assoc($result);
+              $customerID = $row['id_customer'];
 
-            if ($error != "") {
-                    echo "{error: \"$error\", customer: $jsonstr_customer, order: $jsonstr_order}";
-                    
-                } else {
-                    echo "{error: null, customer: $jsonstr_customer, order: $jsonstr_order}";
-                }
+
+              foreach($dataOrder as $key => $value) {
+                  $item = $key;
+                  $count = 0;
+                  foreach ($value as $key2 => $value2) {
+                          if($count == 0)
+                              $price = $value2;
+                          else if($count == 1)
+                              $quantity = $value2;
+
+                          $count++;
+                      }
+                  $error = "";
+                      
+                      $sql2 = "insert into `orders` (item, price, qty, id_customer) VALUES('$item', '$price', '$quantity', '$customerID')";
+                      if (!mysqli_query($db_conn, $sql2)) {
+                          $error .= mysqli_error($db_conn);
+                      }   
+                      
+              }
+
+              if ($error != "") {
+                      echo "{error: \"$error\", customer: $jsonstr_customer, order: $jsonstr_order}";
+                      
+                  } else {
+                      echo "{error: null, customer: $jsonstr_customer, order: $jsonstr_order}";
+                  }
+          }
+
         }
-
-      }
         
 
         break;
       case 'GET':
-        // if (isset($_GET["id_customer"]) && $_GET["action"] == "view_all") 
-        {
-          $orders_list = curl_get_data('http://localhost/webtech/php/view_all_orders.php');
-          echo $orders_list;
-        }
-
+        include ('view_all_orders.php');
         break;
       case 'DELETE':
         parse_str(file_get_contents("php://input"), $ajax_vars);
 
-        if($ajax_vars["action"] == "delete_order")
+        if(isset($ajax_vars["action"]))
         {
-          echo $ajax_vars["idOrder"];
-          curl_get_data('http://localhost/webtech/php/delete_order.php?action=delete_order&idOrder=' . $ajax_vars["idOrder"]);
+          include ('delete_order.php');
         }
-        else if($ajax_vars["action"] == "delete_all_orders")
-        {
-          echo $ajax_vars["idOrder"];
-          curl_get_data('http://localhost/webtech/php/delete_order.php?action=delete_all_orders&idOrder=' . 'null');
-        }
+        else
+          echo('Incorrect deletion');
+
         break;
       default:
       echo"Server query method is incorrect";
@@ -118,18 +110,5 @@ if (mysqli_connect_errno()) {
     }
 
 }
-
-function curl_get_data($url)
-{
-  $curl = curl_init();
-  $timeout = 5;
-  curl_setopt($curl,CURLOPT_URL,$url);
-  curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
-  curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,$timeout);
-  $data = curl_exec($curl);
-  curl_close($curl);
-  return $data;
-}
-
 
 ?>

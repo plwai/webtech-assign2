@@ -2,8 +2,9 @@
 $url_list = array("delete_order", "delete_all_orders");
 
 
-// Connect and select database.
-$db_conn = mysqli_connect("localhost","root","","marrybrowndb");
+require_once __DIR__ . '/database_config.php';
+
+$db_conn = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
 
 if (isset($_GET["action"]) && in_array($_GET["action"], $url_list)) {
 

@@ -2,7 +2,9 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-type:text/plain");
 
-$db_conn = mysqli_connect("localhost","root","","marrybrowndb");
+require_once __DIR__ . '/database_config.php';
+
+$db_conn = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
 
 
 // Check connection
@@ -85,20 +87,6 @@ if (mysqli_connect_errno()) {
         }
 
       }
-      else if($_POST["action"] == "delete_order")
-      {
-        echo"DELETING";
-        echo $_POST["idOrder"];
-        $message = curl_get_data('http://localhost/webtech/php/delete_order.php?action=delete_order&idOrder=' . $_POST["idOrder"]);
-        echo $message;
-      }
-      else if($_POST["action"] == "delete_all_orders")
-      {
-        echo"DELETING";
-        echo $_POST["idOrder"];
-        $message = curl_get_data('http://localhost/webtech/php/delete_order.php?action=delete_all_orders&idOrder=' . 'null');
-        echo $message;
-      }
         
 
         break;
@@ -109,6 +97,20 @@ if (mysqli_connect_errno()) {
           echo $orders_list;
         }
 
+        break;
+      case 'DELETE':
+        parse_str(file_get_contents("php://input"), $ajax_vars);
+
+        if($ajax_vars["action"] == "delete_order")
+        {
+          echo $ajax_vars["idOrder"];
+          curl_get_data('http://localhost/webtech/php/delete_order.php?action=delete_order&idOrder=' . $ajax_vars["idOrder"]);
+        }
+        else if($ajax_vars["action"] == "delete_all_orders")
+        {
+          echo $ajax_vars["idOrder"];
+          curl_get_data('http://localhost/webtech/php/delete_order.php?action=delete_all_orders&idOrder=' . 'null');
+        }
         break;
       default:
       echo"Server query method is incorrect";

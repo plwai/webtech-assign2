@@ -1,6 +1,8 @@
 <?php
 
-$db_conn = mysqli_connect("localhost","root","","marrybrowndb");
+require_once __DIR__ . '/database_config.php';
+
+$db_conn = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
 
 // get all orders from orders table
 $sql = "SELECT * FROM orders";

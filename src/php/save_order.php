@@ -12,8 +12,9 @@ $dataCustomer = json_decode($jsonstr_customer, true);
 $dataOrder = json_decode($jsonstr_order, true);
 
 
-// Connect and select database.
-$db_conn = mysqli_connect("localhost","root","","marrybrowndb");
+require_once __DIR__ . '/database_config.php';
+
+$db_conn = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
 
 // Check connection
 if (mysqli_connect_errno()) {

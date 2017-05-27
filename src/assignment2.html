@@ -32,8 +32,6 @@ Team Member
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script>
       $(document).ready(function() {
-        // Create loading component
-        const ROW_LOAD_COMPONENT = addLoading();
 
         $('#saveorder').click(function() {
           var name = $('#name');
@@ -110,7 +108,7 @@ Team Member
           $.ajax({
             type: "post",
             url: "php/api.php",
-            data: {customer: customerJSON, order: ordersJSON}
+            data: {customer: customerJSON, order: ordersJSON, action: "save_order"}
           })
           .done(function(data) {
             console.log("success");
@@ -152,10 +150,41 @@ Team Member
 
           $.ajax({
             type: "get",
-            url: "php/api.php",
+            data: {action: "view_all_customers"},
+            url: "http://localhost:3000/api.php",
           })
           .done(function(data) {
+            var counter = 1;
+            $('#orderListContent').empty();
 
+            $.each(data, function(key, value) {
+              var td_cus_num = $('<td>');
+              td_cus_num.text(counter++);
+
+              var td_cus = $('<td>');
+              td_cus.text(value.name);
+
+              var td_detail = $('<td>');
+
+              var viewOrder = $("<a class='btn btn-success btn-block'>");
+              viewOrder.prop("href", "#");
+              viewOrder.html("<span class='glyphicon glyphicon-search'></span>");
+              viewOrder.click(function() {
+                $("#orderListContent").find(".active").removeClass("active");
+                $(this).parent().parent().addClass("active");
+                viewDetail(value.id_customer);
+                return false;
+              });
+
+              td_detail.append(viewOrder);
+
+              var new_row = $('<tr>');
+              new_row.append(td_cus_num);
+              new_row.append(td_cus);
+              new_row.append(td_detail);
+
+              $('#orderListContent').append(new_row);
+            });
           })
           .fail(function(data) {
             var td_error = $('<td align="center" colspan="4" class="alert alert-danger">')
@@ -163,6 +192,9 @@ Team Member
 
             $('#orderListContent').empty();
             $('#orderListContent').append(td_error);
+
+            // For debugging only
+            console.log(data);
           });
 
           $('#adminView').show();
@@ -270,6 +302,75 @@ Team Member
         delete orders[item];
       }
 
+      function viewDetail(cus_id) {
+        $('#tblDetailList').show();
+
+        $('#orderDetailContent').empty();
+        $('#orderDetailContent').append(ROW_LOAD_COMPONENT);
+
+        $.ajax({
+          type: "get",
+          data: {action: "view_order", customer_id: cus_id},
+          url: "http://localhost:3000/api.php",
+        })
+        .done(function(data) {
+          var total = 0;
+          $('#orderDetailContent').empty();
+
+          $('#custInfoAdmin').html(data.cusInfo.name + "<br>" + data.cusInfo.address + "<br>" + data.cusInfo.area + "<br>");
+
+          $.each(data.orders, function(key, value) {
+            var qtyprice = parseFloat(value.qty) * parseFloat(value.price).toFixed(2);
+
+            var td_item = $('<td>');
+            td_item.text(value.item);
+
+            var td_price = $('<td>');
+            td_price.text(value.price);
+
+            var td_qty = $('<td>');
+            td_qty.text(value.qty);
+
+            var td_qtyprice = $('<td>');
+            td_qtyprice.text(qtyprice);
+
+            total += qtyprice;
+
+            var new_row = $('<tr>');
+            new_row.append(td_item);
+            new_row.append(td_price);
+            new_row.append(td_qty);
+            new_row.append(td_qtyprice);
+
+            $('#orderDetailContent').append(new_row);
+          });
+
+          var td_total = $('<td colspan="3">');
+          td_total.text("Total");
+
+          var td_totalval = $('<td>');
+          td_totalval.text(total);
+
+          var new_row = $('<tr>');
+          new_row.append(td_total);
+          new_row.append(td_totalval);
+
+          $('#orderDetailContent').append(new_row);
+        })
+        .fail(function(data) {
+          $('custInfoAdmin').text('...');
+
+          var td_error = $('<td align="center" colspan="4" class="alert alert-danger">')
+          td_error.html('<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Fail to load data. Please try again later.');
+
+          $('#orderDetailContent').empty();
+          $('#orderDetailContent').append(td_error);
+
+          // For debugging only
+          console.log(data);
+        });
+      }
+
       function addLoading() {
         var td_load = $('<td align="center" colspan="4">');
         td_load.html('Loading<span class="glyphicon-left glyphicon glyphicon-refresh spinning" style="margin-left:10px;"></span>');
@@ -279,6 +380,9 @@ Team Member
 
         return row_load;
       }
+
+      // Create loading component
+      const ROW_LOAD_COMPONENT = addLoading();
     </script>
   <head>
 
@@ -465,7 +569,7 @@ Team Member
 
     <div class="container-fluid" id="adminView" style="display:none;">
       <div class="row">
-        <div class="col-md-offset-3 col-md-6" style="margin-top: 25px;">
+        <div class="col-md-offset-3 col-md-3" style="margin-top: 25px;">
           <table class="table table-bordered" id="tblOrderList">
             <thead>
               <th colspan="4">Order List</th>
@@ -475,13 +579,46 @@ Team Member
               <tr>
                 <th>Order No.</th>
                 <th>Customer</th>
-                <th>Total</th>
+                <th>Details</th>
               </tr>
             </tbody>
 
             <tbody id="orderListContent">
 
             </tbody>
+          </table>
+        </div>
+
+        <div class="col-md-3" style="margin-top: 25px; ">
+          <table class="table table-bordered" id="tblDetailList" style="display:none;">
+            <thead>
+              <tr>
+                <th colspan="4">CUSTIMER INFO</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td colspan="4" id="custInfoAdmin">...</td>
+              </tr>
+            </tbody>
+
+            <thead>
+              <tr>
+                <th colspan="4">ORDER ITEM</th>
+              </tr>
+              <tr>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Qty * Price</th>
+              </tr>
+            </thead>
+
+            <tbody id="orderDetailContent">
+
+            </tbody>
+
           </table>
         </div>
       </div>

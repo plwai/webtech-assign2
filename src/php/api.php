@@ -31,7 +31,19 @@ if (mysqli_connect_errno()) {
         break;
 
       case 'GET':
-        $menu->viewOrders($db_conn);
+        if(isset($_GET["action"]))
+          {
+            switch($_GET["action"])
+            {
+              case "view_all_orders": $menu->viewAllOrders($db_conn); break;
+              case "view_all_customers": $menu->viewAllCustomers($db_conn); break;
+              default: echo "Incorrect action"; break;
+            }
+
+          }
+         else
+          echo('Incorrect GET action');
+        
         break;
 
       case 'DELETE':
@@ -44,11 +56,12 @@ if (mysqli_connect_errno()) {
           {
             case "delete_order": $menu->deleteOrder($db_conn, $idOrder); break;
             case "delete_all_orders": $menu->deleteAllOrders($db_conn); break;
+            default: echo "Incorrect action"; break;
           }
 
         }
         else
-          echo('Incorrect deletion');
+          echo('Incorrect DELETE action');
 
         break;
 

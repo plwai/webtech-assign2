@@ -157,7 +157,7 @@ Team Member
           $.ajax({
             type: "get",
             data: {action: "view_all_customers"},
-            url: "http://localhost:3000/api.php",
+            url: "php/api.php",
           })
           .done(function(data) {
             var counter = 1;
@@ -321,14 +321,14 @@ Team Member
 
         $.ajax({
           type: "get",
-          data: {action: "view_order", customer_id: cus_id},
-          url: "http://localhost:3000/api.php",
+          data: {action: "view_customer_order", id_customer: cus_id},
+          url: "php/api.php",
         })
         .done(function(data) {
           var total = 0;
           $('#orderDetailContent').empty();
 
-          $('#custInfoAdmin').html(data.cusInfo.name + "<br>" + data.cusInfo.address + "<br>" + data.cusInfo.area + "<br>");
+          $('#custInfoAdmin').html(data.customerInfo[0].name + "<br>" + data.customerInfo[0].address + "<br>" + data.customerInfo[0].area + "<br>");
 
           $.each(data.orders, function(key, value) {
             var qtyprice = parseFloat(value.qty) * parseFloat(value.price).toFixed(2);
@@ -400,8 +400,8 @@ Team Member
       function deleteOrder(cus_id) {
         $.ajax({
           type: "delete",
-          data: {customer_id: cus_id},
-          url: "http://localhost:3000/api.php",
+          data: {customer_id: cus_id, action: "delete_order"},
+          url: "php/api.php",
         })
         .done(function(data) {
           alert("Data deleted");

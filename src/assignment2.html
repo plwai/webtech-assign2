@@ -32,6 +32,9 @@ Team Member
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script>
       $(document).ready(function() {
+        // Create loading component
+        const ROW_LOAD_COMPONENT = addLoading();
+
         $('#saveorder').click(function() {
           var name = $('#name');
           var address = $('#address');
@@ -143,6 +146,9 @@ Team Member
 
         $('#adminPage').click(function() {
           $('#clientView').hide();
+
+          $('#orderListContent').empty();
+          $('#orderListContent').append(ROW_LOAD_COMPONENT);
 
           $.ajax({
             type: "get",
@@ -258,6 +264,16 @@ Team Member
 
         row_item.remove();
         delete orders[item];
+      }
+
+      function addLoading() {
+        var td_load = $('<td align="center "colspan="4">');
+        td_load.html('Loading<span class="glyphicon-left glyphicon glyphicon-refresh spinning" style="margin-left:10px;"></span>');
+
+        var row_load = $("<tr>");
+        row_load.append(td_load);
+
+        return row_load;
       }
     </script>
   <head>
@@ -460,9 +476,7 @@ Team Member
             </tbody>
 
             <tbody id="orderListContent">
-              <tr>
-                <td align="center "colspan="4">Loading<span class='glyphicon-left glyphicon glyphicon-refresh spinning' style="margin-left:10px;"></span></td>
-              </tr>
+
             </tbody>
           </table>
         </div>

@@ -28,8 +28,10 @@ Team Member
       }
     </style>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
     <script>
       $(document).ready(function() {
         $('#saveorder').click(function() {
@@ -106,8 +108,8 @@ Team Member
 
           $.ajax({
             type: "post",
-            url: "php/save_order.php",
-            data: {customer: customerJSON, order: ordersJSON}
+            url: "php/api.php",
+            data: {customer: customerJSON, order: ordersJSON, action: "save_order"}
           })
           .done(function(data) {
             console.log("success");
@@ -139,6 +141,87 @@ Team Member
             alert("Something wrong. Please try again later.");
             sendOrderButton.button('reset');
           });
+        });
+
+        $('#adminPage').click(function() {
+          $('#clientView').hide();
+          $('#tblDetailList').hide();
+          $('#tblOrderList').DataTable().destroy();
+
+          $('#delete_btn').remove();
+          $('#custInfoAdmin').empty();
+          $('#orderDetailContent').empty();
+          $('#orderListContent').empty();
+          $('#orderListContent').append(ROW_LOAD_COMPONENT);
+
+          $.ajax({
+            type: "get",
+            data: {action: "view_all_customers"},
+            url: "http://localhost:3000/api.php",
+          })
+          .done(function(data) {
+            var counter = 1;
+            $('#orderListContent').empty();
+
+            $.each(data, function(key, value) {
+              var td_cus_num = $('<td>');
+              td_cus_num.text(counter++);
+
+              var td_cus = $('<td>');
+              td_cus.text(value.name);
+
+              var td_detail = $('<td>');
+
+              var viewOrder = $("<a class='btn btn-success btn-block'>");
+              viewOrder.prop("href", "#");
+              viewOrder.html("<span class='glyphicon glyphicon-search'></span>");
+              viewOrder.click(function() {
+                $("#orderListContent").find(".active").removeClass("active");
+                $(this).parent().parent().addClass("active");
+                viewDetail(value.id_customer);
+                return false;
+              });
+
+              td_detail.append(viewOrder);
+
+              var new_row = $('<tr>');
+              new_row.append(td_cus_num);
+              new_row.append(td_cus);
+              new_row.append(td_detail);
+
+              $('#orderListContent').append(new_row);
+            });
+
+            $('#tblOrderList').dataTable({
+              "pageLength": 5
+            });
+          })
+          .fail(function(data) {
+            var td_error = $('<td align="center" colspan="4" class="alert alert-danger">')
+            td_error.html('<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Fail to load data. Please try again later.');
+
+            $('#orderListContent').empty();
+            $('#orderListContent').append(td_error);
+
+            // For debugging only
+            console.log(data);
+          });
+
+          $('#adminView').show();
+
+          return false;
+        });
+
+        $('#clientPage').click(function() {
+          $('#adminView').hide();
+          $('#clientView').show();
+
+          return false;
+        });
+
+        $(".nav a").on("click", function(){
+           $(".nav").find(".active").removeClass("active");
+           $(this).parent().addClass("active");
         });
       });
 
@@ -228,6 +311,126 @@ Team Member
         row_item.remove();
         delete orders[item];
       }
+
+      function viewDetail(cus_id) {
+        $('#tblDetailList').show();
+
+        $('#custInfoAdmin').empty();
+        $('#orderDetailContent').empty();
+        $('#orderDetailContent').append(ROW_LOAD_COMPONENT);
+
+        $.ajax({
+          type: "get",
+          data: {action: "view_order", customer_id: cus_id},
+          url: "http://localhost:3000/api.php",
+        })
+        .done(function(data) {
+          var total = 0;
+          $('#orderDetailContent').empty();
+
+          $('#custInfoAdmin').html(data.cusInfo.name + "<br>" + data.cusInfo.address + "<br>" + data.cusInfo.area + "<br>");
+
+          $.each(data.orders, function(key, value) {
+            var qtyprice = parseFloat(value.qty) * parseFloat(value.price).toFixed(2);
+
+            var td_item = $('<td>');
+            td_item.text(value.item);
+
+            var td_price = $('<td>');
+            td_price.text(value.price);
+
+            var td_qty = $('<td>');
+            td_qty.text(value.qty);
+
+            var td_qtyprice = $('<td>');
+            td_qtyprice.text(qtyprice);
+
+            total += qtyprice;
+
+            var new_row = $('<tr>');
+            new_row.append(td_item);
+            new_row.append(td_price);
+            new_row.append(td_qty);
+            new_row.append(td_qtyprice);
+
+            $('#orderDetailContent').append(new_row);
+          });
+
+          var td_total = $('<td colspan="3">');
+          td_total.text("Total");
+
+          var td_totalval = $('<td>');
+          td_totalval.text(total);
+
+          var new_row = $('<tr>');
+          new_row.append(td_total);
+          new_row.append(td_totalval);
+
+          $('#orderDetailContent').append(new_row);
+
+          var delete_btn = $("<button class='btn btn-danger btn-block' style='width:100%;' id='delete_btn' data-loading-text='Processing...'>");
+          delete_btn.prop("href", "#");
+          delete_btn.text("DELETE");
+          delete_btn.click(function() {
+            if(confirm("Warning: Deleting Order Data")){
+              $(this).button("loading");
+              deleteOrder(cus_id);
+            }
+
+            return false;
+          });
+
+          $('#delete_btn').remove();
+          $(delete_btn).insertAfter($('#orderDetailContent').parent());
+        })
+        .fail(function(data) {
+          $('custInfoAdmin').text('...');
+
+          var td_error = $('<td align="center" colspan="4" class="alert alert-danger">')
+          td_error.html('<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Fail to load data. Please try again later.');
+
+          $('#orderDetailContent').empty();
+          $('#orderDetailContent').append(td_error);
+
+          // For debugging only
+          console.log(data);
+        });
+      }
+
+      function deleteOrder(cus_id) {
+        $.ajax({
+          type: "delete",
+          data: {customer_id: cus_id},
+          url: "http://localhost:3000/api.php",
+        })
+        .done(function(data) {
+          alert("Data deleted");
+          $('#adminPage').click();
+          $('#delete_btn').button('reset');
+        })
+        .fail(function(data) {
+          $("#orderDetailContent").find(".alert-danger").remove();
+
+          var td_error = $('<td align="center" colspan="4" class="alert alert-danger">')
+          td_error.html('<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Error while deleting data. Please try again later.');
+
+          $('#orderDetailContent').append(td_error);
+          $('#delete_btn').button('reset');
+        });
+      }
+
+      function addLoading() {
+        var td_load = $('<td align="center" colspan="4">');
+        td_load.html('Loading<span class="glyphicon-left glyphicon glyphicon-refresh spinning" style="margin-left:10px;"></span>');
+
+        var row_load = $("<tr>");
+        row_load.append(td_load);
+
+        return row_load;
+      }
+
+      // Create loading component
+      const ROW_LOAD_COMPONENT = addLoading();
     </script>
   <head>
 
@@ -239,87 +442,202 @@ Team Member
             Marrybrown
           </a>
         </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li class="active">
+              <a href="#" id="clientPage">
+                Order Item
+              </a>
+            </li>
+            <li>
+              <a href="#" id="adminPage">
+                List Customer
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
 
-    <div class="container">
-      <div class="row" style="margin-top: 25px;">
-        <div class="col-md-7">
-          <img src="menu.gif" width="500" height="487" alt="Planets" usemap="#menumap"></td>
+    <div class="container-fluid" id="clientView">
+      <div class="container">
+        <div class="row" style="margin-top: 25px;">
+          <div class="col-md-7">
+            <img src="menu.gif" width="500" height="487" alt="Planets" usemap="#menumap"></td>
+          </div>
+
+          <div class="col-md-5">
+            <table class="table table-bordered" id="tblmain">
+              <thead>
+                <th colspan="4">Order Form</th>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <th>Item</th>
+                  <th>Price</th>
+                  <th>Qty</th>
+                  <th>Qty * Price</th>
+                </tr>
+
+                <tr id="total">
+                  <th colspan="3" align="right"><b>TOTAL (RM)</b></th>
+                  <th id="totalpay" align="right">0</th>
+                </tr>
+
+                <tr id="add">
+                  <td id="item">...</td>
+                  <td id="price" align="right">...</td>
+                  <td align="center"><input class="form-control" class="form-control" type="text" id="qty" size="3" style="text-align:right;"></td>
+                  <td align="center"><button class="btn btn-primary" type="button" id="addupdate" onclick="itemAddUpdate();">Add/Update</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+            <table class="table table-bordered" id="tblcust">
+              <thead>
+                <tr>
+                  <th colspan="2">Customer Form</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <th align="right">Name:</th>
+                  <td><input class="form-control" type="text" id="name" size="30" value=""></td>
+                </tr>
+                <tr>
+                  <th align="right" valign="top">Address:</th>
+                  <td>
+                    <input class="form-control" type="text" id="address" size="50" value="">
+                    <br>
+                    <span style="font-size: 10pt;">(Apartment/building/unit no., street address)</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th align="right">Area:</th>
+                  <td>
+                    <select class="form-control" id="area">
+                      <option value=""></option>
+                      <option value="Bandar Baru Kangkar Pulai">Bandar Baru Kangkar Pulai</option>
+                      <option value="Kangkar Pulai">Kangkar Pulai</option>
+                      <option value="Pulai Emas">Pulai Emas</option>
+                      <option value="Pulai Flora">Pulai Flora</option>
+                      <option value="Pulai Indah">Pulai Indah</option>
+                      <option value="Sri Pulai">Sri Pulai</option>
+                      <option value="Sri Pulai Perdana">Sri Pulai Perdana</option>
+                      <option value="Sri Pulai Perdana 2">Sri Pulai Perdana 2</option>
+                      <option value="UTM">UTM</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" align="center"><button class="btn btn-primary" type="button" id="saveorder">Save Order</button></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table class="table table-bordered" id="tblSum" style="display: none;">
+              <thead>
+                <tr>
+                  <th colspan="4">CUSTIMER INFO</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td colspan="4" id="custInfo">...</td>
+                </tr>
+              </tbody>
+
+              <thead>
+                <tr>
+                  <th colspan="4">ORDER ITEM</th>
+                </tr>
+                <tr>
+                  <th>Item</th>
+                  <th>Price</th>
+                  <th>Qty</th>
+                  <th>Qty * Price</th>
+                </tr>
+              </thead>
+
+              <tbody id="orderSum">
+
+              </tbody>
+
+              <tbody>
+                <tr>
+                  <td colspan="4" align="center">
+                    <button class="btn btn-primary" type="button" id="sendOrder"
+                      data-loading-text="<span class='glyphicon-left glyphicon glyphicon-refresh spinning'></span>... Loading ...">Continue</button>
+                    <button class="btn btn-primary" type="button" id="cancelOrder">Cancel</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <map name="menumap">
+        <area shape="rect" coords="0,138,23,154" alt="Chicken Burger"
+              href="javascript: chooseItem('Chicken Burger', 8.8);" >
+        <area shape="rect" coords="128,138,147,154" alt="Hotouch Burger"
+              href="javascript: chooseItem('Hotouch Burger', 11.1);" >
+        <area shape="rect" coords="252,138,272,154" alt="Tower Burger"
+              href="javascript: chooseItem('Tower Burger', 13.8);" >
+        <area shape="rect" coords="378,138,395,154" alt="Fish Fillet Burger"
+              href="javascript: chooseItem('Fish Fillet Burger', 11.25);" >
+
+        <area shape="rect" coords="0,282,23,298" alt="Lucky Plate"
+              href="javascript: chooseItem('Lucky Plate', 11.90);" >
+        <area shape="rect" coords="128,282,147,298" alt="Chick-A-Licious"
+              href="javascript: chooseItem('Chick-A-Licious', 13.30);" >
+        <area shape="rect" coords="252,282,272,298" alt="Chick-A-Mix"
+              href="javascript: chooseItem('Chick-A-Mix', 11.90);" >
+        <area shape="rect" coords="377,282,395,298" alt="Fish 'n' Chip"
+              href="javascript: chooseItem('Fish \'n\' Chip', 13.90);" >
+
+        <area shape="rect" coords="0,430,23,446" alt="Nasi Marrybrown"
+              href="javascript: chooseItem('Nasi Marrybrown', 9.90);" >
+        <area shape="rect" coords="128,430,147,446" alt="Nasi Ayam MB"
+              href="javascript: chooseItem('Nasi Ayam MB', 10.30);" >
+        <area shape="rect" coords="252,430,272,446" alt="Mi Kari MB"
+              href="javascript: chooseItem('Mi Kari MB', 9.50);" >
+        <area shape="rect" coords="335,430,354,446" alt="Chicken Porridge"
+              href="javascript: chooseItem('Chicken Porridge', 6.50);" >
+        <area shape="rect" coords="418,430,436,446" alt="Seafood Porridge"
+              href="javascript: chooseItem('Seafood Porridge', 7.50);" >
+
+
+      </map>
+    </div>
+
+    <div class="container-fluid" id="adminView" style="display:none;">
+      <div class="row">
+        <div class="col-md-offset-2 col-md-4" style="margin-top: 25px;">
+          <table class="table table-bordered" id="tblOrderList" width="100%">
+            <thead>
+              <tr>
+                <th colspan="4">Order List</th>
+              </tr>
+              <tr>
+                <th>Order No.</th>
+                <th>Customer</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+
+            <tbody id="orderListContent">
+
+            </tbody>
+          </table>
         </div>
 
-        <div class="col-md-5">
-          <table class="table table-bordered" id="tblmain">
-            <thead>
-              <th colspan="4">Order Form</th>
-            </thead>
-
-            <tbody>
-              <tr>
-                <th>Item</th>
-                <th>Price</th>
-                <th>Qty</th>
-                <th>Qty * Price</th>
-              </tr>
-
-              <tr id="total">
-                <th colspan="3" align="right"><b>TOTAL (RM)</b></th>
-                <th id="totalpay" align="right">0</th>
-              </tr>
-
-              <tr id="add">
-                <td id="item">...</td>
-                <td id="price" align="right">...</td>
-                <td align="center"><input class="form-control" class="form-control" type="text" id="qty" size="3" style="text-align:right;"></td>
-                <td align="center"><button class="btn btn-primary" type="button" id="addupdate" onclick="itemAddUpdate();">Add/Update</button></td>
-              </tr>
-            </tbody>
-          </table>
-          <p>
-          <table class="table table-bordered" id="tblcust">
-            <thead>
-              <tr>
-                <th colspan="2">Customer Form</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr>
-                <th align="right">Name:</th>
-                <td><input class="form-control" type="text" id="name" size="30" value=""></td>
-              </tr>
-              <tr>
-                <th align="right" valign="top">Address:</th>
-                <td>
-                  <input class="form-control" type="text" id="address" size="50" value="">
-                  <br>
-                  <span style="font-size: 10pt;">(Apartment/building/unit no., street address)</span>
-                </td>
-              </tr>
-              <tr>
-                <th align="right">Area:</th>
-                <td>
-                  <select class="form-control" id="area">
-                    <option value=""></option>
-                    <option value="Bandar Baru Kangkar Pulai">Bandar Baru Kangkar Pulai</option>
-                    <option value="Kangkar Pulai">Kangkar Pulai</option>
-                    <option value="Pulai Emas">Pulai Emas</option>
-                    <option value="Pulai Flora">Pulai Flora</option>
-                    <option value="Pulai Indah">Pulai Indah</option>
-                    <option value="Sri Pulai">Sri Pulai</option>
-                    <option value="Sri Pulai Perdana">Sri Pulai Perdana</option>
-                    <option value="Sri Pulai Perdana 2">Sri Pulai Perdana 2</option>
-                    <option value="UTM">UTM</option>
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2" align="center"><button class="btn btn-primary" type="button" id="saveorder">Save Order</button></td>
-              </tr>
-            </tbody>
-          </table>
-
-          <table class="table table-bordered" id="tblSum" style="display: none;">
+        <div class="col-md-3" style="margin-top: 25px; ">
+          <table class="table table-bordered" id="tblDetailList" style="display:none;">
             <thead>
               <tr>
                 <th colspan="4">CUSTIMER INFO</th>
@@ -328,7 +646,7 @@ Team Member
 
             <tbody>
               <tr>
-                <td colspan="4" id="custInfo">...</td>
+                <td colspan="4" id="custInfoAdmin">...</td>
               </tr>
             </tbody>
 
@@ -344,55 +662,13 @@ Team Member
               </tr>
             </thead>
 
-            <tbody id="orderSum">
+            <tbody id="orderDetailContent">
 
             </tbody>
 
-            <tbody>
-              <tr>
-                <td colspan="4" align="center">
-                  <button class="btn btn-primary" type="button" id="sendOrder"
-                    data-loading-text="<span class='glyphicon-left glyphicon glyphicon-refresh spinning'></span>... Loading ...">Continue</button>
-                  <button class="btn btn-primary" type="button" id="cancelOrder">Cancel</button>
-                </td>
-              </tr>
-            </tbody>
           </table>
         </div>
       </div>
     </div>
-
-    <map name="menumap">
-      <area shape="rect" coords="0,138,23,154" alt="Chicken Burger"
-            href="javascript: chooseItem('Chicken Burger', 8.8);" >
-      <area shape="rect" coords="128,138,147,154" alt="Hotouch Burger"
-            href="javascript: chooseItem('Hotouch Burger', 11.1);" >
-      <area shape="rect" coords="252,138,272,154" alt="Tower Burger"
-            href="javascript: chooseItem('Tower Burger', 13.8);" >
-      <area shape="rect" coords="378,138,395,154" alt="Fish Fillet Burger"
-            href="javascript: chooseItem('Fish Fillet Burger', 11.25);" >
-
-      <area shape="rect" coords="0,282,23,298" alt="Lucky Plate"
-            href="javascript: chooseItem('Lucky Plate', 11.90);" >
-      <area shape="rect" coords="128,282,147,298" alt="Chick-A-Licious"
-            href="javascript: chooseItem('Chick-A-Licious', 13.30);" >
-      <area shape="rect" coords="252,282,272,298" alt="Chick-A-Mix"
-            href="javascript: chooseItem('Chick-A-Mix', 11.90);" >
-      <area shape="rect" coords="377,282,395,298" alt="Fish 'n' Chip"
-            href="javascript: chooseItem('Fish \'n\' Chip', 13.90);" >
-
-      <area shape="rect" coords="0,430,23,446" alt="Nasi Marrybrown"
-            href="javascript: chooseItem('Nasi Marrybrown', 9.90);" >
-      <area shape="rect" coords="128,430,147,446" alt="Nasi Ayam MB"
-            href="javascript: chooseItem('Nasi Ayam MB', 10.30);" >
-      <area shape="rect" coords="252,430,272,446" alt="Mi Kari MB"
-            href="javascript: chooseItem('Mi Kari MB', 9.50);" >
-      <area shape="rect" coords="335,430,354,446" alt="Chicken Porridge"
-            href="javascript: chooseItem('Chicken Porridge', 6.50);" >
-      <area shape="rect" coords="418,430,436,446" alt="Seafood Porridge"
-            href="javascript: chooseItem('Seafood Porridge', 7.50);" >
-
-
-    </map>
   </body>
 </html>

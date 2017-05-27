@@ -28,11 +28,12 @@ Team Member
       }
     </style>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
     <script>
       $(document).ready(function() {
-
         $('#saveorder').click(function() {
           var name = $('#name');
           var address = $('#address');
@@ -144,7 +145,11 @@ Team Member
 
         $('#adminPage').click(function() {
           $('#clientView').hide();
+          $('#tblDetailList').hide();
+          $('#tblOrderList').DataTable().destroy();
 
+          $('#custInfoAdmin').empty();
+          $('#orderDetailContent').empty();
           $('#orderListContent').empty();
           $('#orderListContent').append(ROW_LOAD_COMPONENT);
 
@@ -184,6 +189,10 @@ Team Member
               new_row.append(td_detail);
 
               $('#orderListContent').append(new_row);
+            });
+
+            $('#tblOrderList').dataTable({
+              "pageLength": 5
             });
           })
           .fail(function(data) {
@@ -305,6 +314,7 @@ Team Member
       function viewDetail(cus_id) {
         $('#tblDetailList').show();
 
+        $('#custInfoAdmin').empty();
         $('#orderDetailContent').empty();
         $('#orderDetailContent').append(ROW_LOAD_COMPONENT);
 
@@ -569,19 +579,18 @@ Team Member
 
     <div class="container-fluid" id="adminView" style="display:none;">
       <div class="row">
-        <div class="col-md-offset-3 col-md-3" style="margin-top: 25px;">
+        <div class="col-md-offset-2 col-md-4" style="margin-top: 25px;">
           <table class="table table-bordered" id="tblOrderList">
             <thead>
-              <th colspan="4">Order List</th>
-            </thead>
-
-            <tbody>
+              <tr>
+                <th colspan="4">Order List</th>
+              </tr>
               <tr>
                 <th>Order No.</th>
                 <th>Customer</th>
                 <th>Details</th>
               </tr>
-            </tbody>
+            </thead>
 
             <tbody id="orderListContent">
 

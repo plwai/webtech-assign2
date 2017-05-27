@@ -91,7 +91,7 @@ class MENU
             $responseJSON["message"] = "No orders found";
         }
 
-        echo json_encode(array_values($responseJSON), JSON_UNESCAPED_SLASHES);
+        echo json_encode($responseJSON);
     }
 
     function viewAllCustomers($db_conn){
@@ -117,7 +117,7 @@ class MENU
             $responseJSON["message"] = "No orders found";
         }
 
-        echo json_encode(array_values($responseJSON), JSON_UNESCAPED_SLASHES);
+        echo json_encode($responseJSON);
     }
 
 
@@ -131,30 +131,30 @@ class MENU
             if (mysqli_num_rows($sql) > 0) {
 
                 $sql = mysqli_fetch_array($sql);
-                $customerOrder = array();
-                $customerOrder["id_customer"] = $sql["id_customer"];
-                $customerOrder["name"] = $sql["name"];
-                $customerOrder["address"] = $sql["address"];
-                $customerOrder["area"] = $sql["area"];
+                $data = array("customerInfo" => array(), "orders" => array());
+                $customer = array();
+                $customer["id_customer"] = $sql["id_customer"];
+                $customer["name"] = $sql["name"];
+                $customer["address"] = $sql["address"];
+                $customer["area"] = $sql["area"];
 
-                $count = 0;
+                // $data[] = $customer;
+                array_push($data["customerInfo"], $customer);
 
                 if(!empty($sql2))
                 {
                     if (mysqli_num_rows($sql2) > 0){
-                        $temp = array();
                         while ($orders = mysqli_fetch_array($sql2)){
-
-                            $count++;
-                            $customerOrder["item".$count] = $orders["item"];
-                            $customerOrder["price".$count] = $orders["price"];
-                            $customerOrder["qty".$count] = $orders["qty"];
-
+                            $order = array();
+                            $order["item"] = $orders["item"];
+                            $order["price"] = $orders["price"];
+                            $order["qty"] = $orders["qty"];
+                            // $data[] = $order;
+                            array_push($data["orders"], $order);
                             }
                         }
                 }
                 
-                echo json_encode($customerOrder);
             } else {
 
                 echo "No items found";
@@ -163,13 +163,7 @@ class MENU
 
             echo "Customer " . $id_customer . " not found.";
         }
-
-
-
-
-
-
-        echo json_encode(array_values($customerOrder), JSON_UNESCAPED_SLASHES);
+        echo json_encode($data);
     }
 
 

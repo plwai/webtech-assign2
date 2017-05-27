@@ -140,6 +140,20 @@ Team Member
             sendOrderButton.button('reset');
           });
         });
+
+        $('#adminPage').click(function() {
+          $('#clientView').hide();
+          $('#adminView').show();
+
+          return false;
+        });
+
+        $('#clientPage').click(function() {
+          $('#adminView').hide();
+          $('#clientView').show();
+
+          return false;
+        });
       });
 
       var orders = {};
@@ -239,160 +253,180 @@ Team Member
             Marrybrown
           </a>
         </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li class="active">
+              <a href="#" id="clientPage">
+                Order Item
+              </a>
+            </li>
+            <li>
+              <a href="#" id="adminPage">
+                List Customer
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
 
-    <div class="container">
-      <div class="row" style="margin-top: 25px;">
-        <div class="col-md-7">
-          <img src="menu.gif" width="500" height="487" alt="Planets" usemap="#menumap"></td>
-        </div>
+    <div class="container-fluid" id="clientView">
+      <div class="container">
+        <div class="row" style="margin-top: 25px;">
+          <div class="col-md-7">
+            <img src="menu.gif" width="500" height="487" alt="Planets" usemap="#menumap"></td>
+          </div>
 
-        <div class="col-md-5">
-          <table class="table table-bordered" id="tblmain">
-            <thead>
-              <th colspan="4">Order Form</th>
-            </thead>
+          <div class="col-md-5">
+            <table class="table table-bordered" id="tblmain">
+              <thead>
+                <th colspan="4">Order Form</th>
+              </thead>
 
-            <tbody>
-              <tr>
-                <th>Item</th>
-                <th>Price</th>
-                <th>Qty</th>
-                <th>Qty * Price</th>
-              </tr>
+              <tbody>
+                <tr>
+                  <th>Item</th>
+                  <th>Price</th>
+                  <th>Qty</th>
+                  <th>Qty * Price</th>
+                </tr>
 
-              <tr id="total">
-                <th colspan="3" align="right"><b>TOTAL (RM)</b></th>
-                <th id="totalpay" align="right">0</th>
-              </tr>
+                <tr id="total">
+                  <th colspan="3" align="right"><b>TOTAL (RM)</b></th>
+                  <th id="totalpay" align="right">0</th>
+                </tr>
 
-              <tr id="add">
-                <td id="item">...</td>
-                <td id="price" align="right">...</td>
-                <td align="center"><input class="form-control" class="form-control" type="text" id="qty" size="3" style="text-align:right;"></td>
-                <td align="center"><button class="btn btn-primary" type="button" id="addupdate" onclick="itemAddUpdate();">Add/Update</button></td>
-              </tr>
-            </tbody>
-          </table>
-          <p>
-          <table class="table table-bordered" id="tblcust">
-            <thead>
-              <tr>
-                <th colspan="2">Customer Form</th>
-              </tr>
-            </thead>
+                <tr id="add">
+                  <td id="item">...</td>
+                  <td id="price" align="right">...</td>
+                  <td align="center"><input class="form-control" class="form-control" type="text" id="qty" size="3" style="text-align:right;"></td>
+                  <td align="center"><button class="btn btn-primary" type="button" id="addupdate" onclick="itemAddUpdate();">Add/Update</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+            <table class="table table-bordered" id="tblcust">
+              <thead>
+                <tr>
+                  <th colspan="2">Customer Form</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              <tr>
-                <th align="right">Name:</th>
-                <td><input class="form-control" type="text" id="name" size="30" value=""></td>
-              </tr>
-              <tr>
-                <th align="right" valign="top">Address:</th>
-                <td>
-                  <input class="form-control" type="text" id="address" size="50" value="">
-                  <br>
-                  <span style="font-size: 10pt;">(Apartment/building/unit no., street address)</span>
-                </td>
-              </tr>
-              <tr>
-                <th align="right">Area:</th>
-                <td>
-                  <select class="form-control" id="area">
-                    <option value=""></option>
-                    <option value="Bandar Baru Kangkar Pulai">Bandar Baru Kangkar Pulai</option>
-                    <option value="Kangkar Pulai">Kangkar Pulai</option>
-                    <option value="Pulai Emas">Pulai Emas</option>
-                    <option value="Pulai Flora">Pulai Flora</option>
-                    <option value="Pulai Indah">Pulai Indah</option>
-                    <option value="Sri Pulai">Sri Pulai</option>
-                    <option value="Sri Pulai Perdana">Sri Pulai Perdana</option>
-                    <option value="Sri Pulai Perdana 2">Sri Pulai Perdana 2</option>
-                    <option value="UTM">UTM</option>
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2" align="center"><button class="btn btn-primary" type="button" id="saveorder">Save Order</button></td>
-              </tr>
-            </tbody>
-          </table>
+              <tbody>
+                <tr>
+                  <th align="right">Name:</th>
+                  <td><input class="form-control" type="text" id="name" size="30" value=""></td>
+                </tr>
+                <tr>
+                  <th align="right" valign="top">Address:</th>
+                  <td>
+                    <input class="form-control" type="text" id="address" size="50" value="">
+                    <br>
+                    <span style="font-size: 10pt;">(Apartment/building/unit no., street address)</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th align="right">Area:</th>
+                  <td>
+                    <select class="form-control" id="area">
+                      <option value=""></option>
+                      <option value="Bandar Baru Kangkar Pulai">Bandar Baru Kangkar Pulai</option>
+                      <option value="Kangkar Pulai">Kangkar Pulai</option>
+                      <option value="Pulai Emas">Pulai Emas</option>
+                      <option value="Pulai Flora">Pulai Flora</option>
+                      <option value="Pulai Indah">Pulai Indah</option>
+                      <option value="Sri Pulai">Sri Pulai</option>
+                      <option value="Sri Pulai Perdana">Sri Pulai Perdana</option>
+                      <option value="Sri Pulai Perdana 2">Sri Pulai Perdana 2</option>
+                      <option value="UTM">UTM</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" align="center"><button class="btn btn-primary" type="button" id="saveorder">Save Order</button></td>
+                </tr>
+              </tbody>
+            </table>
 
-          <table class="table table-bordered" id="tblSum" style="display: none;">
-            <thead>
-              <tr>
-                <th colspan="4">CUSTIMER INFO</th>
-              </tr>
-            </thead>
+            <table class="table table-bordered" id="tblSum" style="display: none;">
+              <thead>
+                <tr>
+                  <th colspan="4">CUSTIMER INFO</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              <tr>
-                <td colspan="4" id="custInfo">...</td>
-              </tr>
-            </tbody>
+              <tbody>
+                <tr>
+                  <td colspan="4" id="custInfo">...</td>
+                </tr>
+              </tbody>
 
-            <thead>
-              <tr>
-                <th colspan="4">ORDER ITEM</th>
-              </tr>
-              <tr>
-                <th>Item</th>
-                <th>Price</th>
-                <th>Qty</th>
-                <th>Qty * Price</th>
-              </tr>
-            </thead>
+              <thead>
+                <tr>
+                  <th colspan="4">ORDER ITEM</th>
+                </tr>
+                <tr>
+                  <th>Item</th>
+                  <th>Price</th>
+                  <th>Qty</th>
+                  <th>Qty * Price</th>
+                </tr>
+              </thead>
 
-            <tbody id="orderSum">
+              <tbody id="orderSum">
 
-            </tbody>
+              </tbody>
 
-            <tbody>
-              <tr>
-                <td colspan="4" align="center">
-                  <button class="btn btn-primary" type="button" id="sendOrder"
-                    data-loading-text="<span class='glyphicon-left glyphicon glyphicon-refresh spinning'></span>... Loading ...">Continue</button>
-                  <button class="btn btn-primary" type="button" id="cancelOrder">Cancel</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              <tbody>
+                <tr>
+                  <td colspan="4" align="center">
+                    <button class="btn btn-primary" type="button" id="sendOrder"
+                      data-loading-text="<span class='glyphicon-left glyphicon glyphicon-refresh spinning'></span>... Loading ...">Continue</button>
+                    <button class="btn btn-primary" type="button" id="cancelOrder">Cancel</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+
+      <map name="menumap">
+        <area shape="rect" coords="0,138,23,154" alt="Chicken Burger"
+              href="javascript: chooseItem('Chicken Burger', 8.8);" >
+        <area shape="rect" coords="128,138,147,154" alt="Hotouch Burger"
+              href="javascript: chooseItem('Hotouch Burger', 11.1);" >
+        <area shape="rect" coords="252,138,272,154" alt="Tower Burger"
+              href="javascript: chooseItem('Tower Burger', 13.8);" >
+        <area shape="rect" coords="378,138,395,154" alt="Fish Fillet Burger"
+              href="javascript: chooseItem('Fish Fillet Burger', 11.25);" >
+
+        <area shape="rect" coords="0,282,23,298" alt="Lucky Plate"
+              href="javascript: chooseItem('Lucky Plate', 11.90);" >
+        <area shape="rect" coords="128,282,147,298" alt="Chick-A-Licious"
+              href="javascript: chooseItem('Chick-A-Licious', 13.30);" >
+        <area shape="rect" coords="252,282,272,298" alt="Chick-A-Mix"
+              href="javascript: chooseItem('Chick-A-Mix', 11.90);" >
+        <area shape="rect" coords="377,282,395,298" alt="Fish 'n' Chip"
+              href="javascript: chooseItem('Fish \'n\' Chip', 13.90);" >
+
+        <area shape="rect" coords="0,430,23,446" alt="Nasi Marrybrown"
+              href="javascript: chooseItem('Nasi Marrybrown', 9.90);" >
+        <area shape="rect" coords="128,430,147,446" alt="Nasi Ayam MB"
+              href="javascript: chooseItem('Nasi Ayam MB', 10.30);" >
+        <area shape="rect" coords="252,430,272,446" alt="Mi Kari MB"
+              href="javascript: chooseItem('Mi Kari MB', 9.50);" >
+        <area shape="rect" coords="335,430,354,446" alt="Chicken Porridge"
+              href="javascript: chooseItem('Chicken Porridge', 6.50);" >
+        <area shape="rect" coords="418,430,436,446" alt="Seafood Porridge"
+              href="javascript: chooseItem('Seafood Porridge', 7.50);" >
+
+
+      </map>
     </div>
 
-    <map name="menumap">
-      <area shape="rect" coords="0,138,23,154" alt="Chicken Burger"
-            href="javascript: chooseItem('Chicken Burger', 8.8);" >
-      <area shape="rect" coords="128,138,147,154" alt="Hotouch Burger"
-            href="javascript: chooseItem('Hotouch Burger', 11.1);" >
-      <area shape="rect" coords="252,138,272,154" alt="Tower Burger"
-            href="javascript: chooseItem('Tower Burger', 13.8);" >
-      <area shape="rect" coords="378,138,395,154" alt="Fish Fillet Burger"
-            href="javascript: chooseItem('Fish Fillet Burger', 11.25);" >
-
-      <area shape="rect" coords="0,282,23,298" alt="Lucky Plate"
-            href="javascript: chooseItem('Lucky Plate', 11.90);" >
-      <area shape="rect" coords="128,282,147,298" alt="Chick-A-Licious"
-            href="javascript: chooseItem('Chick-A-Licious', 13.30);" >
-      <area shape="rect" coords="252,282,272,298" alt="Chick-A-Mix"
-            href="javascript: chooseItem('Chick-A-Mix', 11.90);" >
-      <area shape="rect" coords="377,282,395,298" alt="Fish 'n' Chip"
-            href="javascript: chooseItem('Fish \'n\' Chip', 13.90);" >
-
-      <area shape="rect" coords="0,430,23,446" alt="Nasi Marrybrown"
-            href="javascript: chooseItem('Nasi Marrybrown', 9.90);" >
-      <area shape="rect" coords="128,430,147,446" alt="Nasi Ayam MB"
-            href="javascript: chooseItem('Nasi Ayam MB', 10.30);" >
-      <area shape="rect" coords="252,430,272,446" alt="Mi Kari MB"
-            href="javascript: chooseItem('Mi Kari MB', 9.50);" >
-      <area shape="rect" coords="335,430,354,446" alt="Chicken Porridge"
-            href="javascript: chooseItem('Chicken Porridge', 6.50);" >
-      <area shape="rect" coords="418,430,436,446" alt="Seafood Porridge"
-            href="javascript: chooseItem('Seafood Porridge', 7.50);" >
-
-
-    </map>
+    <div class="container-fluid" id="adminView">
+    </div>
   </body>
 </html>

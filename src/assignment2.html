@@ -106,7 +106,7 @@ Team Member
 
           $.ajax({
             type: "post",
-            url: "php/save_order.php",
+            url: "php/api.php",
             data: {customer: customerJSON, order: ordersJSON}
           })
           .done(function(data) {
@@ -143,6 +143,18 @@ Team Member
 
         $('#adminPage').click(function() {
           $('#clientView').hide();
+
+          $.ajax({
+            type: "get",
+            url: "php/api.php",
+          })
+          .done(function(data) {
+
+          })
+          .fail(function(data) {
+
+          });
+
           $('#adminView').show();
 
           return false;
@@ -153,6 +165,11 @@ Team Member
           $('#clientView').show();
 
           return false;
+        });
+
+        $(".nav a").on("click", function(){
+           $(".nav").find(".active").removeClass("active");
+           $(this).parent().addClass("active");
         });
       });
 
@@ -426,7 +443,30 @@ Team Member
       </map>
     </div>
 
-    <div class="container-fluid" id="adminView">
+    <div class="container-fluid" id="adminView" style="display:none;">
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6" style="margin-top: 25px;">
+          <table class="table table-bordered" id="tblOrderList">
+            <thead>
+              <th colspan="4">Order List</th>
+            </thead>
+
+            <tbody>
+              <tr>
+                <th>Order No.</th>
+                <th>Customer</th>
+                <th>Total</th>
+              </tr>
+            </tbody>
+
+            <tbody id="orderListContent">
+              <tr>
+                <td align="center "colspan="4">Loading<span class='glyphicon-left glyphicon glyphicon-refresh spinning' style="margin-left:10px;"></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </body>
 </html>

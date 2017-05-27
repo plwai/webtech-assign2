@@ -31,12 +31,15 @@ if (mysqli_connect_errno()) {
         break;
 
       case 'GET':
+        // parse_str(file_get_contents("php://input"), $ajax_vars);
+
         if(isset($_GET["action"]))
           {
             switch($_GET["action"])
             {
               case "view_all_orders": $menu->viewAllOrders($db_conn); break;
               case "view_all_customers": $menu->viewAllCustomers($db_conn); break;
+              case "view_customer_order": $menu->viewCustomerOrder($db_conn, $_GET["id_customer"]); break;
               default: echo "Incorrect action"; break;
             }
 

@@ -121,6 +121,59 @@ class MENU
     }
 
 
+    function viewCustomerOrder($db_conn, $id_customer){
+
+        $sql = mysqli_query($db_conn, "SELECT * FROM customers WHERE id_customer = $id_customer");
+        $sql2 = mysqli_query($db_conn, "SELECT * FROM orders WHERE id_customer = $id_customer");
+        
+        if (!empty($sql)) {
+            // check for empty result
+            if (mysqli_num_rows($sql) > 0) {
+
+                $sql = mysqli_fetch_array($sql);
+                $customerOrder = array();
+                $customerOrder["id_customer"] = $sql["id_customer"];
+                $customerOrder["name"] = $sql["name"];
+                $customerOrder["address"] = $sql["address"];
+                $customerOrder["area"] = $sql["area"];
+
+                $count = 0;
+
+                if(!empty($sql2))
+                {
+                    if (mysqli_num_rows($sql2) > 0){
+                        $temp = array();
+                        while ($orders = mysqli_fetch_array($sql2)){
+
+                            $count++;
+                            $customerOrder["item".$count] = $orders["item"];
+                            $customerOrder["price".$count] = $orders["price"];
+                            $customerOrder["qty".$count] = $orders["qty"];
+
+                            }
+                        }
+                }
+                
+                echo json_encode($customerOrder);
+            } else {
+
+                echo "No items found";
+            }
+        } else {
+
+            echo "Customer " . $id_customer . " not found.";
+        }
+
+
+
+
+
+
+        echo json_encode(array_values($customerOrder), JSON_UNESCAPED_SLASHES);
+    }
+
+
+
     function deleteOrder($db_conn, $idOrder){
         // Check connection
         if (mysqli_connect_errno()) {

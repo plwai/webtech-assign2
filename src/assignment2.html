@@ -158,7 +158,11 @@ Team Member
 
           })
           .fail(function(data) {
+            var orderList = $('<td align="center" colspan="4" class="alert alert-danger">')
+            orderList.html('<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Fail to load data. Please try again later.');
 
+            $('#orderListContent').empty();
+            $('#orderListContent').append(orderList);
           });
 
           $('#adminView').show();
@@ -267,7 +271,7 @@ Team Member
       }
 
       function addLoading() {
-        var td_load = $('<td align="center "colspan="4">');
+        var td_load = $('<td align="center" colspan="4">');
         td_load.html('Loading<span class="glyphicon-left glyphicon glyphicon-refresh spinning" style="margin-left:10px;"></span>');
 
         var row_load = $("<tr>");

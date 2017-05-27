@@ -148,6 +148,7 @@ Team Member
           $('#tblDetailList').hide();
           $('#tblOrderList').DataTable().destroy();
 
+          $('#delete_btn').remove();
           $('#custInfoAdmin').empty();
           $('#orderDetailContent').empty();
           $('#orderListContent').empty();
@@ -366,6 +367,21 @@ Team Member
           new_row.append(td_totalval);
 
           $('#orderDetailContent').append(new_row);
+
+          var delete_btn = $("<button class='btn btn-danger btn-block' style='width:100%;' id='delete_btn' data-loading-text='Processing...'>");
+          delete_btn.prop("href", "#");
+          delete_btn.text("DELETE");
+          delete_btn.click(function() {
+            if(confirm("Warning: Deleting Order Data")){
+              $(this).button("loading");
+              deleteOrder(cus_id);
+            }
+
+            return false;
+          });
+
+          $('#delete_btn').remove();
+          $(delete_btn).insertAfter($('#orderDetailContent').parent());
         })
         .fail(function(data) {
           $('custInfoAdmin').text('...');
@@ -378,6 +394,28 @@ Team Member
 
           // For debugging only
           console.log(data);
+        });
+      }
+
+      function deleteOrder(cus_id) {
+        $.ajax({
+          type: "delete",
+          data: {customer_id: cus_id},
+          url: "http://localhost:3000/api.php",
+        })
+        .done(function(data) {
+          alert("Data deleted");
+          $('#adminPage').click();
+          $('#delete_btn').button('reset');
+        })
+        .fail(function(data) {
+          $("#orderDetailContent").find(".alert-danger").remove();
+
+          var td_error = $('<td align="center" colspan="4" class="alert alert-danger">')
+          td_error.html('<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Error while deleting data. Please try again later.');
+
+          $('#orderDetailContent').append(td_error);
+          $('#delete_btn').button('reset');
         });
       }
 
@@ -580,7 +618,7 @@ Team Member
     <div class="container-fluid" id="adminView" style="display:none;">
       <div class="row">
         <div class="col-md-offset-2 col-md-4" style="margin-top: 25px;">
-          <table class="table table-bordered" id="tblOrderList">
+          <table class="table table-bordered" id="tblOrderList" width="100%">
             <thead>
               <tr>
                 <th colspan="4">Order List</th>

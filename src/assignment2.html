@@ -400,7 +400,7 @@ Team Member
       function deleteOrder(cus_id) {
         $.ajax({
           type: "delete",
-          data: {customer_id: cus_id, action: "delete_order"},
+          data: {idCustomer: cus_id, action: "delete_customer_orders"},
           url: "php/api.php",
         })
         .done(function(data) {

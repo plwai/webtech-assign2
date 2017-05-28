@@ -51,7 +51,7 @@ class MENU
                       }
                   $error = "";
 
-                      $sql2 = "insert into `orders` (item, price, qty, id_customer) VALUES('$item', '$price', '$quantity', '$customerID')";
+                      $sql2 = "insert into `orders` (item, price, qty, id_customer) VALUES('".mysqli_real_escape_string($db_conn,$item)."', '$price', '$quantity', '$customerID')";
                       if (!mysqli_query($db_conn, $sql2)) {
                           $error .= mysqli_error($db_conn);
                       }

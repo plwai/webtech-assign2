@@ -1,6 +1,6 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Content-type:text/plain");
+header("Content-type:application/json");
 
 require_once __DIR__ . '/database_config.php';
 $db_conn = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);

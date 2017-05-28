@@ -1,8 +1,8 @@
 <?php
-class MENU 
+class MENU
 {
     function __construct() {
-       
+
     }
 
     function saveOrder($db_conn, $jsonstr_customer, $jsonstr_order) {
@@ -12,14 +12,14 @@ class MENU
         if (mysqli_connect_errno()) {
               $error = mysqli_connect_error();
               echo "{error: \"$error\", customer: $jsonstr_customer, order: $jsonstr_order}";
-              
+
           } else {
 
               $error = "";
 
               $name = ($dataCustomer["name"]);
               $address = ($dataCustomer["address"]);
-              $area = ($dataCustomer["area"]);    
+              $area = ($dataCustomer["area"]);
 
               $sql = "insert into `customers`(name, address, area) VALUES('$name', '$address', '$area')";
                   if (!mysqli_query($db_conn, $sql)) {
@@ -50,19 +50,19 @@ class MENU
                           $count++;
                       }
                   $error = "";
-                      
+
                       $sql2 = "insert into `orders` (item, price, qty, id_customer) VALUES('$item', '$price', '$quantity', '$customerID')";
                       if (!mysqli_query($db_conn, $sql2)) {
                           $error .= mysqli_error($db_conn);
-                      }   
-                      
+                      }
+
               }
 
               if ($error != "") {
                       echo "{error: \"$error\", customer: $jsonstr_customer, order: $jsonstr_order}";
-                      
+
                   } else {
-                      echo "{error: null, customer: $jsonstr_customer, order: $jsonstr_order}";
+                      echo json_encode("{error: null,customer: $jsonstr_customer, order: $jsonstr_order}");
                   }
           }
     }
@@ -77,9 +77,9 @@ class MENU
                 else{
                     $result=mysqli_query($db_conn,$sql);
                 }
-         
+
         if (mysqli_num_rows($result) > 0) {
-            
+
             //create an array
             $responseJSON = array();
             while($row =mysqli_fetch_assoc($result))
@@ -103,9 +103,9 @@ class MENU
                 else{
                     $result=mysqli_query($db_conn,$sql);
                 }
-         
+
         if (mysqli_num_rows($result) > 0) {
-            
+
             //create an array
             $responseJSON = array();
             while($row =mysqli_fetch_assoc($result))
@@ -125,7 +125,7 @@ class MENU
 
         $sql = mysqli_query($db_conn, "SELECT * FROM customers WHERE id_customer = $id_customer");
         $sql2 = mysqli_query($db_conn, "SELECT * FROM orders WHERE id_customer = $id_customer");
-        
+
         if (!empty($sql)) {
             if (mysqli_num_rows($sql) > 0) {
 
@@ -151,7 +151,7 @@ class MENU
                             }
                         }
                 }
-                
+
             } else {
 
                 echo "No items found";
@@ -170,7 +170,7 @@ class MENU
         if (mysqli_connect_errno()) {
             $error = mysqli_connect_error();
             echo "{error: \"$error\"}";
-            
+
         } else {
 
             $error = "";
@@ -186,7 +186,7 @@ class MENU
             } else {
                 echo "Order ID ". $idOrder . " not found";
             }
-        }  
+        }
     }
 
     function deleteAllOrders($db_conn){
@@ -194,11 +194,11 @@ class MENU
         if (mysqli_connect_errno()) {
             $error = mysqli_connect_error();
             echo "{error: \"$error\"}";
-            
+
         } else {
 
             $error = "";
-            
+
             $sql = "DELETE FROM `orders` ";
                 if (!mysqli_query($db_conn, $sql)) {
                     $error = mysqli_error($db_conn);
@@ -210,7 +210,7 @@ class MENU
             } else {
                 echo "Order table is empty";
             }
-        }  
+        }
     }
 
     function deleteCustomerOrders($db_conn, $id_customer){
@@ -218,7 +218,7 @@ class MENU
         if (mysqli_connect_errno()) {
             $error = mysqli_connect_error();
             echo "{error: \"$error\"}";
-            
+
         } else {
 
             $error = "";
@@ -229,28 +229,26 @@ class MENU
                 }
 
             // check if order has been deleted
-            if (mysqli_affected_rows($db_conn) > 0) {
-                echo "Customer with ID " . $id_customer . " has been deleted";;
-            } else {
-                echo "Customer does not exist";
+            if (mysqli_affected_rows($db_conn) == 0) {
+              echo "Customer does not exist";
+              return;
             }
 
-                
-            
             $sql2 = "DELETE FROM `orders` WHERE id_customer = $id_customer";
                 if (!mysqli_query($db_conn, $sql2)) {
                     $error = mysqli_error($db_conn);
                 }
 
             // check if order has been deleted
-            if (mysqli_affected_rows($db_conn) > 0) {
-                echo "CUSTOMER's ORDERS DELETED";
-            } else {
+            if (mysqli_affected_rows($db_conn) == 0) {
                 echo "Customer does not have any orders";
+                return;
             }
-        }  
+
+            echo json_encode("{success: true}");
+        }
     }
-   
+
 
 }
 

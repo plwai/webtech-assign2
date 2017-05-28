@@ -137,7 +137,7 @@ Team Member
             sendOrderButton.button('reset');
           })
           .fail(function(data) {
-            console.log("fail");
+            console.log(data);
             alert("Something wrong. Please try again later.");
             sendOrderButton.button('reset');
           });
@@ -162,6 +162,13 @@ Team Member
           .done(function(data) {
             var counter = 1;
             $('#orderListContent').empty();
+
+            if(data.message == "No orders found") {
+              $('#tblOrderList').dataTable({
+                "pageLength": 5
+              });
+              return;
+            }
 
             $.each(data, function(key, value) {
               var td_cus_num = $('<td>');
@@ -409,6 +416,7 @@ Team Member
           $('#delete_btn').button('reset');
         })
         .fail(function(data) {
+          console.log(data);
           $("#orderDetailContent").find(".alert-danger").remove();
 
           var td_error = $('<td align="center" colspan="4" class="alert alert-danger">')

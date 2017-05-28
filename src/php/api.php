@@ -54,11 +54,11 @@ if (mysqli_connect_errno()) {
 
         if(isset($ajax_vars["action"]))
         {
-          $idOrder = $ajax_vars["idOrder"];
           switch($ajax_vars["action"])
           {
-            case "delete_order": $menu->deleteOrder($db_conn, $idOrder); break;
+            case "delete_one_order": $idOrder = $ajax_vars["idOrder"]; $menu->deleteOrder($db_conn, $idOrder); break;
             case "delete_all_orders": $menu->deleteAllOrders($db_conn); break;
+            case "delete_customer_orders": $idCustomer = $ajax_vars["idCustomer"]; $menu->deleteCustomerOrders($db_conn, $idCustomer); break;
             default: echo "Incorrect action"; break;
           }
 

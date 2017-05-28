@@ -127,7 +127,6 @@ class MENU
         $sql2 = mysqli_query($db_conn, "SELECT * FROM orders WHERE id_customer = $id_customer");
         
         if (!empty($sql)) {
-            // check for empty result
             if (mysqli_num_rows($sql) > 0) {
 
                 $sql = mysqli_fetch_array($sql);
@@ -138,7 +137,6 @@ class MENU
                 $customer["address"] = $sql["address"];
                 $customer["area"] = $sql["area"];
 
-                // $data[] = $customer;
                 array_push($data["customerInfo"], $customer);
 
                 if(!empty($sql2))
@@ -149,7 +147,6 @@ class MENU
                             $order["item"] = $orders["item"];
                             $order["price"] = $orders["price"];
                             $order["qty"] = $orders["qty"];
-                            // $data[] = $order;
                             array_push($data["orders"], $order);
                             }
                         }
@@ -212,6 +209,44 @@ class MENU
                 echo "ALL ORDERS DELETED";
             } else {
                 echo "Order table is empty";
+            }
+        }  
+    }
+
+    function deleteCustomerOrders($db_conn, $id_customer){
+        // Check connection
+        if (mysqli_connect_errno()) {
+            $error = mysqli_connect_error();
+            echo "{error: \"$error\"}";
+            
+        } else {
+
+            $error = "";
+
+            $sql1 = "DELETE FROM `customers` WHERE id_customer = $id_customer";
+                if (!mysqli_query($db_conn, $sql1)) {
+                    $error = mysqli_error($db_conn);
+                }
+
+            // check if order has been deleted
+            if (mysqli_affected_rows($db_conn) > 0) {
+                echo "Customer with ID " . $id_customer . " has been deleted";;
+            } else {
+                echo "Customer does not exist";
+            }
+
+                
+            
+            $sql2 = "DELETE FROM `orders` WHERE id_customer = $id_customer";
+                if (!mysqli_query($db_conn, $sql2)) {
+                    $error = mysqli_error($db_conn);
+                }
+
+            // check if order has been deleted
+            if (mysqli_affected_rows($db_conn) > 0) {
+                echo "CUSTOMER's ORDERS DELETED";
+            } else {
+                echo "Customer does not have any orders";
             }
         }  
     }

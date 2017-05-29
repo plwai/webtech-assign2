@@ -157,7 +157,7 @@ Team Member
           $.ajax({
             type: "get",
             data: {action: "view_all_customers"},
-            url: "http://localhost:3000/php/api.php",
+            url: "php/api.php",
           })
           .done(function(data) {
             var counter = 1;
@@ -329,7 +329,7 @@ Team Member
         $.ajax({
           type: "get",
           data: {action: "view_customer_order", id_customer: cus_id},
-          url: "http://localhost:3000/php/api.php",
+          url: "php/api.php",
         })
         .done(function(data) {
           var total = 0;

@@ -345,7 +345,7 @@ Team Member
               td_item.text(value.item);
 
               var td_price = $('<td>');
-              td_price.text(value.price.toFixed(2));
+              td_price.text(parseFloat(value.price).toFixed(2));
 
               var td_qty = $('<td>');
               td_qty.text(value.qty);

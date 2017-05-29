@@ -333,62 +333,64 @@ Team Member
         })
         .done(function(data) {
           var total = 0;
-          $('#orderDetailContent').empty();
 
-          $('#custInfoAdmin').html(data.customerInfo[0].name + "<br>" + data.customerInfo[0].address + "<br>" + data.customerInfo[0].area + "<br>");
+          if(typeof(data.customerInfo) != "undefined" && data.customerInfo !== null) {
+            $('#orderDetailContent').empty();
+            $('#custInfoAdmin').html(data.customerInfo[0].name + "<br>" + data.customerInfo[0].address + "<br>" + data.customerInfo[0].area + "<br>");
 
-          $.each(data.orders, function(key, value) {
-            var qtyprice = parseFloat(value.qty) * parseFloat(value.price).toFixed(2);
+            $.each(data.orders, function(key, value) {
+              var qtyprice = (parseFloat(value.qty) * parseFloat(value.price)).toFixed(2);
 
-            var td_item = $('<td>');
-            td_item.text(value.item);
+              var td_item = $('<td>');
+              td_item.text(value.item);
 
-            var td_price = $('<td>');
-            td_price.text(value.price);
+              var td_price = $('<td>');
+              td_price.text(value.price.toFixed(2));
 
-            var td_qty = $('<td>');
-            td_qty.text(value.qty);
+              var td_qty = $('<td>');
+              td_qty.text(value.qty);
 
-            var td_qtyprice = $('<td>');
-            td_qtyprice.text(qtyprice);
+              var td_qtyprice = $('<td>');
+              td_qtyprice.text(qtyprice);
 
-            total += qtyprice;
+              total += parseFloat(qtyprice);
+
+              var new_row = $('<tr>');
+              new_row.append(td_item);
+              new_row.append(td_price);
+              new_row.append(td_qty);
+              new_row.append(td_qtyprice);
+
+              $('#orderDetailContent').append(new_row);
+            });
+
+            var td_total = $('<td colspan="3">');
+            td_total.text("Total");
+
+            var td_totalval = $('<td>');
+            td_totalval.text(total.toFixed(2));
 
             var new_row = $('<tr>');
-            new_row.append(td_item);
-            new_row.append(td_price);
-            new_row.append(td_qty);
-            new_row.append(td_qtyprice);
+            new_row.append(td_total);
+            new_row.append(td_totalval);
 
             $('#orderDetailContent').append(new_row);
-          });
 
-          var td_total = $('<td colspan="3">');
-          td_total.text("Total");
+            var delete_btn = $("<button class='btn btn-danger btn-block' style='width:100%;' id='delete_btn' data-loading-text='Processing...'>");
+            delete_btn.prop("href", "#");
+            delete_btn.text("DELETE");
+            delete_btn.click(function() {
+              if(confirm("Warning: Deleting Order Data")){
+                $(this).button("loading");
+                deleteOrder(cus_id);
+              }
 
-          var td_totalval = $('<td>');
-          td_totalval.text(total);
+              return false;
+            });
 
-          var new_row = $('<tr>');
-          new_row.append(td_total);
-          new_row.append(td_totalval);
-
-          $('#orderDetailContent').append(new_row);
-
-          var delete_btn = $("<button class='btn btn-danger btn-block' style='width:100%;' id='delete_btn' data-loading-text='Processing...'>");
-          delete_btn.prop("href", "#");
-          delete_btn.text("DELETE");
-          delete_btn.click(function() {
-            if(confirm("Warning: Deleting Order Data")){
-              $(this).button("loading");
-              deleteOrder(cus_id);
-            }
-
-            return false;
-          });
-
-          $('#delete_btn').remove();
-          $(delete_btn).insertAfter($('#orderDetailContent').parent());
+            $('#delete_btn').remove();
+            $(delete_btn).insertAfter($('#orderDetailContent').parent());
+          }
         })
         .fail(function(data) {
           $('custInfoAdmin').text('...');
